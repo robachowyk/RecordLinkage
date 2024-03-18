@@ -1,0 +1,18 @@
+Package: RecLinkSurv
+Type: Package
+Title: Model based on Stochastic Expectation Maximization for
+        time-to-event data and record linkage
+Version: 0.0.1
+Date: 2023-11-22
+Authors@R: person("Michel H", "Hof", email = "m.h.hof@amsterdamumc.nl",
+        role = c("aut", "cre"))
+Description: The RecLinkSurv package simultaneously fits a record linkage model and a time-to-event model to two datasets.
+License: GPL (>= 2)
+Imports: Rcpp (>= 1.0.11), Matrix, numDeriv, plyr, progress, MASS
+LinkingTo: Rcpp, RcppArmadillo
+RoxygenNote: 7.2.3
+NeedsCompilation: yes
+Packaged: 2023-12-18 12:45:59 UTC; Michel
+Author: Michel H Hof [aut, cre]
+Maintainer: Michel H Hof <m.h.hof@amsterdamumc.nl>
+Depends: R (>= 3.5.0)

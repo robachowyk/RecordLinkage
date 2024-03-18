@@ -47,3 +47,11 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Folders created by RecordLinkage programs
+Simulation*/
+SHIW*/
+NLTCS*/
+draft*/
+Draft*/
+**/.DS_Store
