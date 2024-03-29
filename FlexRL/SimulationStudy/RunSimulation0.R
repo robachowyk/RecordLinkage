@@ -5,30 +5,28 @@ library(progress)
 library(Matrix)
 library(testit)
 library("BRL")
-source("recordlinkage.r")
-Rcpp:::sourceCpp("functions.cpp")
+source("../recordlinkage.r")
+Rcpp:::sourceCpp("../functions.cpp")
 
-Nsimu = 20
+Nsimu = 10
 
-# should be 20000 and 10000 / 10000 and 10000 100000
-ExchangerNSamples = 200
-ExchangerNBurnin = 100
+# should be 20000 and 10000 or 10000 and 100000
+ExchangerNSamples = 2000
+ExchangerNBurnin = 1000
 
-# should be 100, 50, 100, 75 gibbs 100/200 or 100,150 or...
+# should be 100, 75, 200 and 100
 FlexRLUnstableStEMIter     = 100
 FlexRLUnstableStEMBurnin   = 75
 FlexRLUnstableGibbsIter    = 100
 FlexRLUnstableGibbsBurnin  = 50
 
-# should be 100, 50, 50, 25 TO TEST, NO
+# should be 100, 75, 200 and 100
 FlexRLStableStEMIter     = 100
 FlexRLStableStEMBurnin   = 75
 FlexRLStableGibbsIter    = 100
 FlexRLStableGibbsBurnin  = 50
 
-# BRL by default is 1000 samples and 10%=100 burn-in
-
-didnotworkExchanger = 0
+# BRL by default is 1000 samples and 10% = 100 burn-in
 
 NdataA = 800
 NdataB = 1000
@@ -60,7 +58,7 @@ PIVs_stable = sapply(PIVs_config, function(x) x$stable)
 newDirectory = sprintf("Simulation 0 %s", Sys.time())
 dir.create(newDirectory)
 
-methods = c("ExchangerSelf", "ExchangerUs", "Exchanger", "BRL", "FlexRL_instability4V5", "FlexRL_noinstability", "Naive")
+methods = c("Exchanger", "BRL", "FlexRL_instability4V5", "FlexRL_noinstability", "Naive")
 
 Nmethods                                                = length(methods)
 results_f1score                                         = data.frame( matrix(0, nrow=Nsimu, ncol=Nmethods) )
@@ -77,9 +75,6 @@ results_TP                                              = data.frame( matrix(0, 
 colnames(results_TP)                                    = methods
 results_MatrixDistance                                  = data.frame( matrix(0, nrow=Nsimu, ncol=Nmethods) )
 colnames(results_MatrixDistance)                        = methods
-
-results_exchangerdedup                                  = data.frame( matrix(0, nrow=Nsimu, ncol=1) )
-colnames(results_exchangerdedup)                        = c("Exchanger")
 
 # overall data generated
 simu_NA_A                                               = data.frame( matrix(0, nrow=Nsimu, ncol=length(PIVs)) )
@@ -136,14 +131,21 @@ for(i in 1:Nmethods){
   colnames(simu_NAB_FN)                                 = PIVs
   simu_NAB_linked                                       = data.frame( matrix(0, nrow=Nsimu, ncol=length(PIVs)) )
   colnames(simu_NAB_linked)                             = PIVs
-  assign( paste(method, "simu_NAA_TP",                  sep="_"), simu_NAA_TP )
-  assign( paste(method, "simu_NAA_FP",                  sep="_"), simu_NAA_FP )
-  assign( paste(method, "simu_NAA_FN",                  sep="_"), simu_NAA_FN )
-  assign( paste(method, "simu_NAA_linked",              sep="_"), simu_NAA_linked )
-  assign( paste(method, "simu_NAB_TP",                  sep="_"), simu_NAB_TP )
-  assign( paste(method, "simu_NAB_FP",                  sep="_"), simu_NAB_FP )
-  assign( paste(method, "simu_NAB_FN",                  sep="_"), simu_NAB_FN )
-  assign( paste(method, "simu_NAB_linked",              sep="_"), simu_NAB_linked )
+  if(method == "Exchanger"){
+    assign( paste(method, "simu_NARL_TP",                  sep="_"), simu_NAA_TP )
+    assign( paste(method, "simu_NARL_FP",                  sep="_"), simu_NAA_FP )
+    assign( paste(method, "simu_NARL_FN",                  sep="_"), simu_NAA_FN )
+    assign( paste(method, "simu_NARL_linked",              sep="_"), simu_NAA_linked )
+  }else{
+    assign( paste(method, "simu_NAA_TP",                  sep="_"), simu_NAA_TP )
+    assign( paste(method, "simu_NAA_FP",                  sep="_"), simu_NAA_FP )
+    assign( paste(method, "simu_NAA_FN",                  sep="_"), simu_NAA_FN )
+    assign( paste(method, "simu_NAA_linked",              sep="_"), simu_NAA_linked )
+    assign( paste(method, "simu_NAB_TP",                  sep="_"), simu_NAB_TP )
+    assign( paste(method, "simu_NAB_FP",                  sep="_"), simu_NAB_FP )
+    assign( paste(method, "simu_NAB_FN",                  sep="_"), simu_NAB_FN )
+    assign( paste(method, "simu_NAB_linked",              sep="_"), simu_NAB_linked )
+  }
   
   # AGREEMENTS
   simu_agree_TP                                         = data.frame( matrix(0, nrow=Nsimu, ncol=length(PIVs)) )
@@ -238,160 +240,17 @@ for(iter in 1:Nsimu){
   distort_prior <- BetaRV(1, 4)
   distort_prior_0 <- BetaRV(1, 100)
   attr_params <- list(
-    V1 = CategoricalAttribute(distort_prior, distort_dist_prior = DirichletProcess(GammaRV(2, 1e-4)), entity_dist_prior = DirichletRV(1.0)),
-    V2 = CategoricalAttribute(distort_prior, distort_dist_prior = DirichletProcess(GammaRV(2, 1e-4)), entity_dist_prior = DirichletRV(1.0)),
-    V3 = CategoricalAttribute(distort_prior, distort_dist_prior = DirichletProcess(GammaRV(2, 1e-4)), entity_dist_prior = DirichletRV(1.0)),
-    V4 = CategoricalAttribute(distort_prior, distort_dist_prior = DirichletProcess(GammaRV(2, 1e-4)), entity_dist_prior = DirichletRV(1.0)),
-    V5 = CategoricalAttribute(distort_prior_0, distort_dist_prior = DirichletProcess(GammaRV(2, 1e-4)), entity_dist_prior = DirichletRV(1.0)) )
-  )
-  # attr_params <- list(
-  #   V1 = CategoricalAttribute(distort_prob_prior = distort_prior),
-  #   V2 = CategoricalAttribute(distort_prob_prior = distort_prior),
-  #   V3 = CategoricalAttribute(distort_prob_prior = distort_prior),
-  #   V4 = CategoricalAttribute(distort_prob_prior = distort_prior),
-  #   V5 = CategoricalAttribute(distort_prob_prior = distort_prior_0)
-  # )
+                        V1 = CategoricalAttribute(distort_prob_prior = distort_prior),
+                        V2 = CategoricalAttribute(distort_prob_prior = distort_prior),
+                        V3 = CategoricalAttribute(distort_prob_prior = distort_prior),
+                        V4 = CategoricalAttribute(distort_prob_prior = distort_prior),
+                        V5 = CategoricalAttribute(distort_prob_prior = distort_prior_0) )
   clust_prior <- PitmanYorRP(alpha = GammaRV(1, 0.01), d = BetaRV(1, 1))
   model <- exchanger(RLdata, attr_params, clust_prior)
   result <- run_inference(model, n_samples=ExchangerNSamples, thin_interval=10, burnin_interval=ExchangerNBurnin)
   pred_clust <- smp_clusters(result)
   n_records <- nrow(RLdata)
   pred_pairs <- clusters_to_pairs(pred_clust)
-  measures <- eval_report_pairs(true_pairs, pred_pairs, num_pairs=n_records*(n_records-1)/2)
-  
-  if ( nrow(pred_pairs)<=1 ){
-    print("RE RUN EXCHANGER DID NOT WORK")
-    didnotworkExchanger = didnotworkExchanger + 1
-    next
-  }
-  ### SAVE RESULTS
-  DeltaExchanger = matrix(0, nrow=nrow(A), ncol=nrow(B))
-  dedup = 0
-  for (l in 1:nrow(pred_pairs))
-  {
-    idx_row_RLdata_A = as.integer(pred_pairs[l,1])
-    idx_row_RLdata_B = as.integer(pred_pairs[l,2])
-    idxA = RLdata[rownames(RLdata) == idx_row_RLdata_A, ]$localID
-    idxB = RLdata[rownames(RLdata) == idx_row_RLdata_B, ]$localID
-    if( (idxA <= nrow(DeltaExchanger)) & (idxB <= ncol(DeltaExchanger)) ){
-      DeltaExchanger[idxA,idxB] = 1
-    }else{
-      dedup = dedup + 1
-    }
-  }
-  # STORY TELLING
-  # LINKED
-  linkedpairs = which(DeltaExchanger>0.5, arr.ind=TRUE)
-  linkedpairsA = linkedpairs[,1]
-  linkedpairsB = linkedpairs[,2]
-  Exchanger_simu_NAA_linked[iter,] = ( colSums(is.na(A[linkedpairsA,])) / length(linkedpairsA) )[PIVs]
-  Exchanger_simu_NAB_linked[iter,] = ( colSums(is.na(B[linkedpairsB,])) / length(linkedpairsB) )[PIVs]
-  Exchanger_simu_agree_linked_tmp = data.frame( matrix(0, nrow=0, ncol=length(PIVs)) )
-  colnames(Exchanger_simu_agree_linked_tmp) = PIVs
-  Exchanger_simu_unstable_change_linked_tmp = data.frame( matrix(0, nrow=0, ncol=length(PIVs)) )
-  colnames(Exchanger_simu_unstable_change_linked_tmp) = PIVs
-  for( i in 1:nrow(linkedpairs) ){
-    entityA = A[linkedpairsA[i],]
-    entityB = B[linkedpairsB[i],]
-    if(nrow(entityA)>0){
-      if(nrow(entityB)>0){
-        Exchanger_simu_agree_linked_tmp = rbind(Exchanger_simu_agree_linked_tmp, entityA[,PIVs] == entityB[,PIVs])
-        Exchanger_simu_unstable_change_linked_tmp = rbind(Exchanger_simu_unstable_change_linked_tmp, entityB[,"change"])
-      }
-    }
-  }
-  Exchanger_simu_agree_linked_tmp = colSums( Exchanger_simu_agree_linked_tmp, na.rm = TRUE ) / nrow( Exchanger_simu_agree_linked_tmp )
-  Exchanger_simu_unstable_change_linked_tmp = colSums( Exchanger_simu_unstable_change_linked_tmp, na.rm = TRUE ) / nrow( Exchanger_simu_unstable_change_linked_tmp )
-  Exchanger_simu_agree_linked[iter,] = Exchanger_simu_agree_linked_tmp
-  Exchanger_simu_unstable_change_linked[iter,] = Exchanger_simu_unstable_change_linked_tmp
-  # TP
-  linkedTP = which((DeltaExchanger>0.5) & (Delta==1), arr.ind=TRUE)
-  linkedTPA = linkedTP[,1]
-  linkedTPB = linkedTP[,2]
-  Exchanger_simu_NAA_TP[iter,] = ( colSums(is.na(A[linkedTPA,])) / length(linkedTPA) )[PIVs]
-  Exchanger_simu_NAB_TP[iter,] = ( colSums(is.na(B[linkedTPB,])) / length(linkedTPB) )[PIVs]
-  Exchanger_simu_agree_TP_tmp = data.frame( matrix(0, nrow=0, ncol=length(PIVs)) )
-  colnames(Exchanger_simu_agree_TP_tmp) = PIVs
-  Exchanger_simu_unstable_change_TP_tmp = data.frame( matrix(0, nrow=0, ncol=length(PIVs)) )
-  colnames(Exchanger_simu_unstable_change_TP_tmp) = PIVs
-  for( i in 1:nrow(linkedTP) ){
-    entityA = A[linkedTPA[i],]
-    entityB = B[linkedTPB[i],]
-    if(nrow(entityA)>0){
-      if(nrow(entityB)>0){
-        Exchanger_simu_agree_TP_tmp = rbind(Exchanger_simu_agree_TP_tmp, entityA[,PIVs] == entityB[,PIVs])
-        Exchanger_simu_unstable_change_TP_tmp = rbind(Exchanger_simu_unstable_change_TP_tmp, entityB[,"change"])
-      }
-    }
-  }
-  Exchanger_simu_agree_TP_tmp = colSums( Exchanger_simu_agree_TP_tmp, na.rm = TRUE ) / nrow( Exchanger_simu_agree_TP_tmp )
-  Exchanger_simu_unstable_change_TP_tmp = colSums( Exchanger_simu_unstable_change_TP_tmp, na.rm = TRUE ) / nrow( Exchanger_simu_unstable_change_TP_tmp )
-  Exchanger_simu_agree_TP[iter,] = Exchanger_simu_agree_TP_tmp
-  Exchanger_simu_unstable_change_TP[iter,] = Exchanger_simu_unstable_change_TP_tmp
-  # FP
-  linkedFP = which((DeltaExchanger>0.5) & (Delta==0), arr.ind=TRUE)
-  linkedFPA = linkedFP[,1]
-  linkedFPB = linkedFP[,2]
-  Exchanger_simu_NAA_FP[iter,] = ( colSums(is.na(A[linkedFPA,])) / length(linkedFPA) )[PIVs]
-  Exchanger_simu_NAB_FP[iter,] = ( colSums(is.na(B[linkedFPB,])) / length(linkedFPB) )[PIVs]
-  Exchanger_simu_agree_FP_tmp = data.frame( matrix(0, nrow=0, ncol=length(PIVs)) )
-  colnames(Exchanger_simu_agree_FP_tmp) = PIVs
-  Exchanger_simu_unstable_change_FP_tmp = data.frame( matrix(0, nrow=0, ncol=length(PIVs)) )
-  colnames(Exchanger_simu_unstable_change_FP_tmp) = PIVs
-  for( i in 1:nrow(linkedFP) ){
-    entityA = A[linkedFPA[i],]
-    entityB = B[linkedFPB[i],]
-    if(nrow(entityA)>0){
-      if(nrow(entityB)>0){
-        Exchanger_simu_agree_FP_tmp = rbind(Exchanger_simu_agree_FP_tmp, entityA[,PIVs] == entityB[,PIVs])
-        Exchanger_simu_unstable_change_FP_tmp = rbind(Exchanger_simu_unstable_change_FP_tmp, entityB[,"change"])
-      }
-    }
-  }
-  Exchanger_simu_agree_FP_tmp = colSums( Exchanger_simu_agree_FP_tmp, na.rm = TRUE ) / nrow( Exchanger_simu_agree_FP_tmp )
-  Exchanger_simu_unstable_change_FP_tmp = colSums( Exchanger_simu_unstable_change_FP_tmp, na.rm = TRUE ) / nrow( Exchanger_simu_unstable_change_FP_tmp )
-  Exchanger_simu_agree_FP[iter,] = Exchanger_simu_agree_FP_tmp
-  Exchanger_simu_unstable_change_FP[iter,] = Exchanger_simu_unstable_change_FP_tmp
-  # FN
-  linkedFN = which((DeltaExchanger<0.5) & (Delta==1), arr.ind=TRUE)
-  linkedFNA = linkedFN[,1]
-  linkedFNB = linkedFN[,2]
-  Exchanger_simu_NAA_FN[iter,] = ( colSums(is.na(A[linkedFNA,])) / length(linkedFNA) )[PIVs]
-  Exchanger_simu_NAB_FN[iter,] = ( colSums(is.na(B[linkedFNB,])) / length(linkedFNB) )[PIVs]
-  Exchanger_simu_agree_FN_tmp = data.frame( matrix(0, nrow=0, ncol=length(PIVs)) )
-  colnames(Exchanger_simu_agree_FN_tmp) = PIVs
-  Exchanger_simu_unstable_change_FN_tmp = data.frame( matrix(0, nrow=0, ncol=length(PIVs)) )
-  colnames(Exchanger_simu_unstable_change_FN_tmp) = PIVs
-  for( i in 1:nrow(linkedFN) ){
-    entityA = A[linkedFNA[i],]
-    entityB = B[linkedFNB[i],]
-    if(nrow(entityA)>0){
-      if(nrow(entityB)>0){
-        Exchanger_simu_agree_FN_tmp = rbind(Exchanger_simu_agree_FN_tmp, entityA[,PIVs] == entityB[,PIVs])
-        Exchanger_simu_unstable_change_FN_tmp = rbind(Exchanger_simu_unstable_change_FN_tmp, entityB[,"change"])
-      }
-    }
-  }
-  Exchanger_simu_agree_FN_tmp = colSums( Exchanger_simu_agree_FN_tmp, na.rm = TRUE ) / nrow( Exchanger_simu_agree_FN_tmp )
-  Exchanger_simu_unstable_change_FN_tmp = colSums( Exchanger_simu_unstable_change_FN_tmp, na.rm = TRUE ) / nrow( Exchanger_simu_unstable_change_FN_tmp )
-  Exchanger_simu_agree_FN[iter,] = Exchanger_simu_agree_FN_tmp
-  Exchanger_simu_unstable_change_FN[iter,] = Exchanger_simu_unstable_change_FN_tmp
-  # METRICS
-  truepositive = sum( (DeltaExchanger>0.5) & (Delta==1) )
-  falsepositive = sum( (DeltaExchanger>0.5) & (Delta==0) ) + dedup
-  falsenegative = sum( (DeltaExchanger<0.5) & (Delta==1) )
-  precision = truepositive / (truepositive + falsepositive)
-  recall = truepositive / (truepositive + falsenegative)
-  f1score = 2 * (precision * recall) / (precision + recall)
-  results_f1score[iter, "Exchanger"] = f1score
-  results_recall[iter, "Exchanger"] = recall
-  results_precision[iter, "Exchanger"] = precision
-  results_FN[iter, "Exchanger"] = falsenegative
-  results_FP[iter, "Exchanger"] = falsepositive
-  results_TP[iter, "Exchanger"] = truepositive
-  results_MatrixDistance[iter, "Exchanger"] = sqrt(sum((DeltaExchanger - Delta)**2))
-  results_exchangerdedup[iter, "Exchanger"] = dedup
-  
   comb_pairs <- rbind(true_pairs, pred_pairs)
   true_pairs <- comb_pairs[seq_len(nrow(true_pairs)),]
   pred_pairs <- comb_pairs[nrow(true_pairs) + seq_len(nrow(pred_pairs)),]
@@ -404,23 +263,104 @@ for(iter in 1:Nsimu){
   prediction = factor(merged_pairs$pred_match, levels = c(TRUE, FALSE))
   truth = factor(merged_pairs$match, levels = c(TRUE, FALSE))
   CT = table(prediction, truth, dnn = c("Prediction", "Truth"))
+  ### SAVE RESULTS
+  # STORY TELLING
+  # LINKED
+  Exchanger_simu_NARL_linked[iter,] = ( ( colSums(is.na(RLdata[df_pred_pairs[,1],])) + colSums(is.na(RLdata[df_pred_pairs[,2],])) ) / nrow(df_pred_pairs) )[PIVs]
+  Exchanger_simu_agree_linked_tmp = data.frame( matrix(0, nrow=0, ncol=length(PIVs)) )
+  colnames(Exchanger_simu_agree_linked_tmp) = PIVs
+  Exchanger_simu_unstable_change_linked_tmp = data.frame( matrix(0, nrow=0, ncol=length(PIVs)) )
+  colnames(Exchanger_simu_unstable_change_linked_tmp) = PIVs
+  for( i in 1:nrow(df_pred_pairs) ){
+    entity1 = RLdata[df_pred_pairs[i,1],]
+    entity2 = RLdata[df_pred_pairs[i,2],]
+    if(nrow(entity1)>0){
+      if(nrow(entity2)>0){
+        Exchanger_simu_agree_linked_tmp = rbind(Exchanger_simu_agree_linked_tmp, entity1[,PIVs] == entity2[,PIVs])
+        Exchanger_simu_unstable_change_linked_tmp = rbind(Exchanger_simu_unstable_change_linked_tmp, entity1[,"change"]+entity2[,"change"])
+      }
+    }
+  }
+  Exchanger_simu_agree_linked_tmp = colSums( Exchanger_simu_agree_linked_tmp, na.rm = TRUE ) / nrow( Exchanger_simu_agree_linked_tmp )
+  Exchanger_simu_unstable_change_linked_tmp = colSums( Exchanger_simu_unstable_change_linked_tmp, na.rm = TRUE ) / nrow( Exchanger_simu_unstable_change_linked_tmp )
+  Exchanger_simu_agree_linked[iter,] = Exchanger_simu_agree_linked_tmp
+  Exchanger_simu_unstable_change_linked[iter,] = Exchanger_simu_unstable_change_linked_tmp
+  # TP
+  linkedTP = merged_pairs[merged_pairs$match==TRUE & merged_pairs$pred_match==TRUE, ]
+  Exchanger_simu_NARL_TP[iter,] = ( ( colSums(is.na(RLdata[linkedTP[,1],])) + colSums(is.na(RLdata[linkedTP[,2],])) ) / nrow(linkedTP) )[PIVs]
+  Exchanger_simu_agree_TP_tmp = data.frame( matrix(0, nrow=0, ncol=length(PIVs)) )
+  colnames(Exchanger_simu_agree_TP_tmp) = PIVs
+  Exchanger_simu_unstable_change_TP_tmp = data.frame( matrix(0, nrow=0, ncol=length(PIVs)) )
+  colnames(Exchanger_simu_unstable_change_TP_tmp) = PIVs
+  for( i in 1:nrow(linkedTP) ){
+    entity1 = RLdata[ linkedTP[i,1], ]
+    entity2 = RLdata[ linkedTP[i,2], ]
+    if(nrow(entity1)>0){
+      if(nrow(entity2)>0){
+        Exchanger_simu_agree_TP_tmp = rbind(Exchanger_simu_agree_TP_tmp, entity1[,PIVs] == entity2[,PIVs])
+        Exchanger_simu_unstable_change_TP_tmp = rbind(Exchanger_simu_unstable_change_TP_tmp, entity1[,"change"]+entity2[,"change"])
+      }
+    }
+  }
+  Exchanger_simu_agree_TP_tmp = colSums( Exchanger_simu_agree_TP_tmp, na.rm = TRUE ) / nrow( Exchanger_simu_agree_TP_tmp )
+  Exchanger_simu_unstable_change_TP_tmp = colSums( Exchanger_simu_unstable_change_TP_tmp, na.rm = TRUE ) / nrow( Exchanger_simu_unstable_change_TP_tmp )
+  Exchanger_simu_agree_TP[iter,] = Exchanger_simu_agree_TP_tmp
+  Exchanger_simu_unstable_change_TP[iter,] = Exchanger_simu_unstable_change_TP_tmp
+  # FP
+  linkedFP = merged_pairs[merged_pairs$match==FALSE & merged_pairs$pred_match==TRUE, ]
+  Exchanger_simu_NARL_FP[iter,] = ( ( colSums(is.na(RLdata[linkedFP[,1],])) + colSums(is.na(RLdata[linkedFP[,2],])) ) / nrow(linkedFP) )[PIVs]
+  Exchanger_simu_agree_FP_tmp = data.frame( matrix(0, nrow=0, ncol=length(PIVs)) )
+  colnames(Exchanger_simu_agree_FP_tmp) = PIVs
+  Exchanger_simu_unstable_change_FP_tmp = data.frame( matrix(0, nrow=0, ncol=length(PIVs)) )
+  colnames(Exchanger_simu_unstable_change_FP_tmp) = PIVs
+  for( i in 1:nrow(linkedFP) ){
+    entity1 = RLdata[ linkedFP[i,1], ]
+    entity2 = RLdata[ linkedFP[i,2], ]
+    if(nrow(entity1)>0){
+      if(nrow(entity2)>0){
+        Exchanger_simu_agree_FP_tmp = rbind(Exchanger_simu_agree_FP_tmp, entity1[,PIVs] == entity2[,PIVs])
+        Exchanger_simu_unstable_change_FP_tmp = rbind(Exchanger_simu_unstable_change_FP_tmp, entity1[,"change"]+entity2[,"change"])
+      }
+    }
+  }
+  Exchanger_simu_agree_FP_tmp = colSums( Exchanger_simu_agree_FP_tmp, na.rm = TRUE ) / nrow( Exchanger_simu_agree_FP_tmp )
+  Exchanger_simu_unstable_change_FP_tmp = colSums( Exchanger_simu_unstable_change_FP_tmp, na.rm = TRUE ) / nrow( Exchanger_simu_unstable_change_FP_tmp )
+  Exchanger_simu_agree_FP[iter,] = Exchanger_simu_agree_FP_tmp
+  Exchanger_simu_unstable_change_FP[iter,] = Exchanger_simu_unstable_change_FP_tmp
+  # FN
+  linkedFN = merged_pairs[merged_pairs$match==TRUE & merged_pairs$pred_match==FALSE, ]
+  Exchanger_simu_NARL_FN[iter,] = ( ( colSums(is.na(RLdata[linkedFN[,1],])) + colSums(is.na(RLdata[linkedFN[,2],])) ) / nrow(linkedFN) )[PIVs]
+  Exchanger_simu_agree_FN_tmp = data.frame( matrix(0, nrow=0, ncol=length(PIVs)) )
+  colnames(Exchanger_simu_agree_FN_tmp) = PIVs
+  Exchanger_simu_unstable_change_FN_tmp = data.frame( matrix(0, nrow=0, ncol=length(PIVs)) )
+  colnames(Exchanger_simu_unstable_change_FN_tmp) = PIVs
+  for( i in 1:nrow(linkedFN) ){
+    entity1 = RLdata[ linkedFN[i,1], ]
+    entity2 = RLdata[ linkedFN[i,2], ]
+    if(nrow(entity1)>0){
+      if(nrow(entity2)>0){
+        Exchanger_simu_agree_FN_tmp = rbind(Exchanger_simu_agree_FN_tmp, entity1[,PIVs] == entity2[,PIVs])
+        Exchanger_simu_unstable_change_FN_tmp = rbind(Exchanger_simu_unstable_change_FN_tmp, entity1[,"change"]+entity2[,"change"])
+      }
+    }
+  }
+  Exchanger_simu_agree_FN_tmp = colSums( Exchanger_simu_agree_FN_tmp, na.rm = TRUE ) / nrow( Exchanger_simu_agree_FN_tmp )
+  Exchanger_simu_unstable_change_FN_tmp = colSums( Exchanger_simu_unstable_change_FN_tmp, na.rm = TRUE ) / nrow( Exchanger_simu_unstable_change_FN_tmp )
+  Exchanger_simu_agree_FN[iter,] = Exchanger_simu_agree_FN_tmp
+  Exchanger_simu_unstable_change_FN[iter,] = Exchanger_simu_unstable_change_FN_tmp
+  # METRICS
   tp <- CT["TRUE", "TRUE"]
   fp <- CT["TRUE", "FALSE"]
   fn <- CT["FALSE", "TRUE"]
   precision = tp / (tp + fp)
   recall = tp / (tp + fn)
   f1score = 2 * (precision * recall) / (precision + recall)
-  results_f1score[iter, "ExchangerUs"] = f1score
-  results_precision[iter, "ExchangerUs"] = precision
-  results_recall[iter, "ExchangerUs"] = recall
-  results_FN[iter, "ExchangerUs"] = fn
-  results_FP[iter, "ExchangerUs"] = fp
-  results_TP[iter, "ExchangerUs"] = tp
-  
-  measures <- eval_report_pairs(true_pairs, pred_pairs, num_pairs=n_records*(n_records-1)/2)
-  results_f1score[iter, "ExchangerSelf"] = measures$f1score
-  results_recall[iter, "ExchangerSelf"] = measures$recall
-  results_precision[iter, "ExchangerSelf"] = measures$precision
+  results_f1score[iter, "Exchanger"] = f1score
+  results_precision[iter, "Exchanger"] = precision
+  results_recall[iter, "Exchanger"] = recall
+  results_FN[iter, "Exchanger"] = fn
+  results_FP[iter, "Exchanger"] = fp
+  results_TP[iter, "Exchanger"] = tp
   
   # linePID = system("ps -C R", intern=TRUE)
   # lineV = system("ps v", intern=TRUE)
@@ -767,7 +707,7 @@ for(iter in 1:Nsimu){
   Naive_simu_unstable_change_FN[iter,] = Naive_simu_unstable_change_FN_tmp
   # METRICS
   truepositive = sum( (DeltaNaive>0.5) & (Delta==1) )
-  falsepositive = sum( (DeltaNaive>0.5) & (Delta==0) ) + dedup
+  falsepositive = sum( (DeltaNaive>0.5) & (Delta==0) )
   falsenegative = sum( (DeltaNaive<0.5) & (Delta==1) )
   precision = truepositive / (truepositive + falsepositive)
   recall = truepositive / (truepositive + falsenegative)
@@ -1102,14 +1042,10 @@ for(iter in 1:Nsimu){
   write.csv(simu_truelinks_agree, file.path(newDirectory, "datasetSimu_truelinks_agree.csv"))
   write.csv(simu_truelinks_unstable_change, file.path(newDirectory, "datasetSimu_truelinks_unstable_change.csv"))
   
-  write.csv(Exchanger_simu_NAA_TP, file.path(newDirectory, "datasetSimuExchanger_NAA_TP.csv"))
-  write.csv(Exchanger_simu_NAA_FP, file.path(newDirectory, "datasetSimuExchanger_NAA_FP.csv"))
-  write.csv(Exchanger_simu_NAA_FN, file.path(newDirectory, "datasetSimuExchanger_NAA_FN.csv"))
-  write.csv(Exchanger_simu_NAA_linked, file.path(newDirectory, "datasetSimuExchanger_NAA_linked.csv"))
-  write.csv(Exchanger_simu_NAB_TP, file.path(newDirectory, "datasetSimuExchanger_NAB_TP.csv"))
-  write.csv(Exchanger_simu_NAB_FP, file.path(newDirectory, "datasetSimuExchanger_NAB_FP.csv"))
-  write.csv(Exchanger_simu_NAB_FN, file.path(newDirectory, "datasetSimuExchanger_NAB_FN.csv"))
-  write.csv(Exchanger_simu_NAB_linked, file.path(newDirectory, "datasetSimuExchanger_NAB_linked.csv"))
+  write.csv(Exchanger_simu_NARL_TP, file.path(newDirectory, "datasetSimuExchanger_NARL_TP.csv"))
+  write.csv(Exchanger_simu_NARL_FP, file.path(newDirectory, "datasetSimuExchanger_NARL_FP.csv"))
+  write.csv(Exchanger_simu_NARL_FN, file.path(newDirectory, "datasetSimuExchanger_NARL_FN.csv"))
+  write.csv(Exchanger_simu_NARL_linked, file.path(newDirectory, "datasetSimuExchanger_NARL_linked.csv"))
   write.csv(Exchanger_simu_agree_TP, file.path(newDirectory, "datasetSimuExchanger_agree_TP.csv"))
   write.csv(Exchanger_simu_agree_FP, file.path(newDirectory, "datasetSimuExchanger_agree_FP.csv"))
   write.csv(Exchanger_simu_agree_FN, file.path(newDirectory, "datasetSimuExchanger_agree_FN.csv"))
@@ -1194,7 +1130,6 @@ for(iter in 1:Nsimu){
   write.csv(results_FP, file.path(newDirectory, "datasetSimu_results_FP.csv"))
   write.csv(results_TP, file.path(newDirectory, "datasetSimu_results_TP.csv"))
   write.csv(results_MatrixDistance, file.path(newDirectory, "datasetSimu_results_MatrixDistance.csv"))
-  write.csv(results_exchangerdedup, file.path(newDirectory, "datasetSimu_results_exchangerdedup.csv"))
   
   write.csv(results_unstable_gamma, file.path(newDirectory, "datasetSimu_results_unstable_gamma.csv"))
   write.csv(results_unstable_phi_agree_V1, file.path(newDirectory, "datasetSimu_results_unstable_phi_agree_V1.csv"))

@@ -146,13 +146,13 @@ prediction = factor(merged_pairs$pred_match, levels = c(TRUE, FALSE))
 truth = factor(merged_pairs$match, levels = c(TRUE, FALSE))
 CT = table(prediction, truth, dnn = c("Prediction", "Truth"))
 ### MISSING IN LINKED PAIRS
-NA_RL = ( colSums(is.na(RLdata[df_pred_pairs[,1],]))+colSums(is.na(RLdata[df_pred_pairs[,2],])) / nrow(df_pred_pairs) )[PIVs]
+NA_RL = ( ( colSums(is.na(RLdata[df_pred_pairs[,1],]))+colSums(is.na(RLdata[df_pred_pairs[,2],])) ) / nrow(df_pred_pairs) )[PIVs]
 ### AGREEMENTS IN LINKED PAIRS
 recapAgreementsLinkedPairs = data.frame(matrix(0, nrow=0, ncol=length(PIVs)))
 colnames(recapAgreementsLinkedPairs) = PIVs
 for( i in 1:nrow(df_pred_pairs) ){
-  entity1 = RLdata[ df_pred_pairs[,1], ]
-  entity2 = RLdata[ df_pred_pairs[,2], ]
+  entity1 = RLdata[ df_pred_pairs[i,1], ]
+  entity2 = RLdata[ df_pred_pairs[i,2], ]
   if(nrow(entity1)>0){
     if(nrow(entity2)>0){
       recapAgreementsLinkedPairs = rbind(recapAgreementsLinkedPairs, entity1[,PIVs] == entity2[,PIVs])
@@ -167,7 +167,7 @@ rownames(df) = c("NaN in linked pairs", "agreements btw linked pairs")
 write.csv(df, file.path(newDirectory, "datasetSHIW_recaplinkedpairs_Exchanger.csv"))
 ### MISSING IN TP
 linkedTP = merged_pairs[merged_pairs$match==TRUE & merged_pairs$pred_match==TRUE, ]
-NA_RL = ( colSums(is.na(RLdata[linkedTP[,1],]))+colSums(is.na(RLdata[linkedTP[,2],])) / nrow(linkedTP) )[PIVs]
+NA_RL = ( ( colSums(is.na(RLdata[linkedTP[,1],]))+colSums(is.na(RLdata[linkedTP[,2],])) ) / nrow(linkedTP) )[PIVs]
 ### AGREEMENTS IN TP
 recapAgreementsTP = data.frame(matrix(0, nrow=0, ncol=length(PIVs)))
 colnames(recapAgreementsTP) = PIVs
@@ -188,7 +188,7 @@ rownames(df) = c("NaN in linked TP", "agreements btw TP")
 write.csv(df, file.path(newDirectory, "datasetSHIW_recaplinkedTP_Exchanger.csv"))
 ### MISSING IN FP
 linkedFP = merged_pairs[merged_pairs$match==FALSE & merged_pairs$pred_match==TRUE, ]
-NA_RL = ( colSums(is.na(RLdata[linkedFP[,1],]))+colSums(is.na(RLdata[linkedFP[,2],])) / nrow(linkedFP) )[PIVs]
+NA_RL = ( ( colSums(is.na(RLdata[linkedFP[,1],]))+colSums(is.na(RLdata[linkedFP[,2],])) ) / nrow(linkedFP) )[PIVs]
 ### AGREEMENTS IN FP
 recapAgreementsFP = data.frame(matrix(0, nrow=0, ncol=length(PIVs)))
 colnames(recapAgreementsFP) = PIVs
@@ -209,7 +209,7 @@ rownames(df) = c("NaN in linked FP", "agreements btw FP")
 write.csv(df, file.path(newDirectory, "datasetSHIW_recaplinkedFP_Exchanger.csv"))
 ### MISSING IN FN
 linkedFN = merged_pairs[merged_pairs$match==TRUE & merged_pairs$pred_match==FALSE, ]
-NA_RL = ( colSums(is.na(RLdata[linkedFN[,1],]))+colSums(is.na(RLdata[linkedFN[,2],])) / nrow(linkedFN) )[PIVs]
+NA_RL = ( ( colSums(is.na(RLdata[linkedFN[,1],]))+colSums(is.na(RLdata[linkedFN[,2],])) ) / nrow(linkedFN) )[PIVs]
 ### AGREEMENTS IN FN
 recapAgreementsFN = data.frame(matrix(0, nrow=0, ncol=length(PIVs)))
 colnames(recapAgreementsFN) = PIVs
