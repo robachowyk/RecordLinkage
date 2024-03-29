@@ -6,7 +6,7 @@ For support requests, contact m dot h dot hof at amsterdamumc dot nl.
 
 ## Installation
 
-The package is available on CRAN but can also be installed from girhub as follows:
+The package is available on CRAN but can also be installed from github as follows:
 
 ``` r
 library(devtools)
