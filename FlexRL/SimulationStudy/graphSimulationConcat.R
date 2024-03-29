@@ -1,7 +1,8 @@
 library("tikzDevice")
+ExportTikzForPaper = FALSE
   
 folders = c(
-  "Simulationtest"
+
 )
 
 CombineSimu = function(folders, pattern){
@@ -331,79 +332,114 @@ phiV3_data = phiV3_data[non_zero,]
 phiV4_data = phiV4_data[non_zero,]
 phiV5_data = phiV5_data[non_zero,]
 
-# par(mfrow=c(2,3))
-
-tikz('phiv1 instabl.tex', width = 3.25, height = 3.25)
+par(mfrow=c(2,3))
+if(ExportTikzForPaper){
+  tikz('phiv1 instabl.tex', width = 3.25, height = 3.25)
+}
 phiV1_mean_line = 1 - apply(phiV1_data, 2, mean)
 phiV1_sd_shape = apply(phiV1_data, 2, stats::sd)
 plot(phiV1_mean_line, type="l", ylim=c(0,1), xlab="StEM iterations", ylab=sprintf("Mistakes in PIV V1"))
-# title(main=c("Parameter for mistakes,", "FlexRL: instability and mistakes"), outer=TRUE, line=-2)
+if(!ExportTikzForPaper){
+  title(main=c("Parameter for mistakes,", "FlexRL: instability and mistakes"), outer=TRUE, line=-2)
+}
 polygon( c(1:length(phiV1_mean_line), rev(1:length(phiV1_mean_line))), c(phiV1_mean_line-phiV1_sd_shape, rev(phiV1_mean_line+phiV1_sd_shape)), col=adjustcolor("gray",alpha.f=0.6), border=NA)
 abline(h = true_mistake_V1_mean, col="red")
 polygon( c(1:length(true_mistake_V1_mean), rev(1:length(true_mistake_V1_mean))), c(true_mistake_V1_mean-true_mistake_V1_sd, rev(true_mistake_V1_mean+true_mistake_V1_sd)), col=adjustcolor("red",alpha.f=0.4), border=NA)
-dev.off()
+if(ExportTikzForPaper){
+  dev.off()
+}
 
-tikz('phiv2 instabl.tex', width = 3.25, height = 3.25)
+if(ExportTikzForPaper){
+  tikz('phiv2 instabl.tex', width = 3.25, height = 3.25)
+}
 phiV2_mean_line = 1 - apply(phiV2_data, 2, mean)
 phiV2_sd_shape = apply(phiV2_data, 2, stats::sd)
 plot(phiV2_mean_line, type="l", ylim=c(0,1), xlab="StEM iterations", ylab=sprintf("Mistakes in PIV V2"))
 polygon( c(1:length(phiV2_mean_line), rev(1:length(phiV2_mean_line))), c(phiV2_mean_line-phiV2_sd_shape, rev(phiV2_mean_line+phiV2_sd_shape)), col=adjustcolor("gray",alpha.f=0.6), border=NA)
 abline(h = true_mistake_V2_mean, col="red")
 polygon( c(1:length(true_mistake_V2_mean), rev(1:length(true_mistake_V2_mean))), c(true_mistake_V2_mean-true_mistake_V2_sd, rev(true_mistake_V2_mean+true_mistake_V2_sd)), col=adjustcolor("red",alpha.f=0.4), border=NA)
-dev.off()
+if(ExportTikzForPaper){
+  dev.off()
+}
 
-tikz('phiv3 instabl.tex', width = 3.25, height = 3.25)
+if(ExportTikzForPaper){
+  tikz('phiv3 instabl.tex', width = 3.25, height = 3.25)
+}
 phiV3_mean_line = 1 - apply(phiV3_data, 2, mean)
 phiV3_sd_shape = apply(phiV3_data, 2, stats::sd)
 plot(phiV3_mean_line, type="l", ylim=c(0,1), xlab="StEM iterations", ylab=sprintf("Mistakes in PIV V3"))
 polygon( c(1:length(phiV3_mean_line), rev(1:length(phiV3_mean_line))), c(phiV3_mean_line-phiV3_sd_shape, rev(phiV3_mean_line+phiV3_sd_shape)), col=adjustcolor("gray",alpha.f=0.6), border=NA)
 abline(h = true_mistake_V3_mean, col="red")
 polygon( c(1:length(true_mistake_V3_mean), rev(1:length(true_mistake_V3_mean))), c(true_mistake_V3_mean-true_mistake_V3_sd, rev(true_mistake_V3_mean+true_mistake_V3_sd)), col=adjustcolor("red",alpha.f=0.4), border=NA)
-dev.off()
+if(ExportTikzForPaper){
+  dev.off()
+}
 
-tikz('phiv4 instabl.tex', width = 3.25, height = 3.25)
+if(ExportTikzForPaper){
+  tikz('phiv4 instabl.tex', width = 3.25, height = 3.25)
+}
 phiV4_mean_line = 1 - apply(phiV4_data, 2, mean)
 phiV4_sd_shape = apply(phiV4_data, 2, stats::sd)
 plot(phiV4_mean_line, type="l", ylim=c(0,1), xlab="StEM iterations", ylab=sprintf("Mistakes in PIV V4"))
 polygon( c(1:length(phiV4_mean_line), rev(1:length(phiV4_mean_line))), c(phiV4_mean_line-phiV4_sd_shape, rev(phiV4_mean_line+phiV4_sd_shape)), col=adjustcolor("gray",alpha.f=0.6), border=NA)
 abline(h = true_mistake_V4_mean, col="red")
 polygon( c(1:length(true_mistake_V4_mean), rev(1:length(true_mistake_V4_mean))), c(true_mistake_V4_mean-true_mistake_V4_sd, rev(true_mistake_V4_mean+true_mistake_V4_sd)), col=adjustcolor("red",alpha.f=0.4), border=NA)
-dev.off()
+if(ExportTikzForPaper){
+  dev.off()
+}
 
-tikz('phiv5 instabl.tex', width = 3.25, height = 3.25)
+if(ExportTikzForPaper){
+  tikz('phiv5 instabl.tex', width = 3.25, height = 3.25)
+}
 phiV5_mean_line = 1 - apply(phiV5_data, 2, mean)
 phiV5_sd_shape = apply(phiV5_data, 2, stats::sd)
 plot(phiV5_mean_line, type="l", ylim=c(0,1), xlab="StEM iterations", ylab=sprintf("Mistakes in PIV V5"))
 polygon( c(1:length(phiV5_mean_line), rev(1:length(phiV5_mean_line))), c(phiV5_mean_line-phiV5_sd_shape, rev(phiV5_mean_line+phiV5_sd_shape)), col=adjustcolor("gray",alpha.f=0.6), border=NA)
 abline(h = true_mistake_V5_mean, col="red")
 polygon( c(1:length(true_mistake_V5_mean), rev(1:length(true_mistake_V5_mean))), c(true_mistake_V5_mean-true_mistake_V5_sd, rev(true_mistake_V5_mean+true_mistake_V5_sd)), col=adjustcolor("red",alpha.f=0.4), border=NA)
-dev.off()
+if(ExportTikzForPaper){
+  dev.off()
+}
 
 #### GAMMA 
-# par(mfrow=c(1,1))
 
-tikz('gamma instabl.tex', width = 3.25, height = 3.25)
+par(mfrow=c(1,1))
+
+if(ExportTikzForPaper){
+  tikz('gamma instabl.tex', width = 3.25, height = 3.25)
+}
 gamma_data = CombineSimu(folders, "Simu_results_unstable_gamma\\.csv$")
 gamma_mean_line = apply(gamma_data[non_zero,], 2, mean)
 gamma_sd_shape = apply(gamma_data[non_zero,], 2, stats::sd)
 plot(gamma_mean_line, type="l", ylim=c(0,1), xlab="post burnin StEM iterations", ylab="gamma")
-# title(main=c("Proportion of links", "FlexRL: instability for V5 and mistakes"), outer=TRUE, line=-2)
+if(!ExportTikzForPaper){
+  title(main=c("Proportion of links", "FlexRL: instability for V5 and mistakes"), outer=TRUE, line=-2)
+}
 polygon( c(1:length(gamma_mean_line), rev(1:length(gamma_mean_line))), c(gamma_mean_line-gamma_sd_shape, rev(gamma_mean_line+gamma_sd_shape)), col=adjustcolor("gray",alpha.f=0.6), border=NA)
 abline(h = 5/8, col="red")
-dev.off()
+if(ExportTikzForPaper){
+  dev.off()
+}
 
 #### ALPHA
-# par(mfrow=c(1,3))
 
-tikz('alpha instabl.tex', width = 3.25, height = 3.25)
+par(mfrow=c(1,3))
+
+if(ExportTikzForPaper){
+  tikz('alpha instabl.tex', width = 3.25, height = 3.25)
+}
 alpha_data = CombineSimu(folders, "Simu_results_unstable_alpha_param\\.csv$")
 alpha_mean_line = apply(alpha_data[non_zero,], 2, mean)
 alpha_sd_shape = apply(alpha_data[non_zero,], 2, stats::sd)
 plot(alpha_mean_line, type="l", ylim=c(0,1), xlab="post burnin StEM iterations", ylab="exp alpha V5")
-# title(main=c("PIVs Dynamics", "FlexRL: instability for V5 and mistakes"), outer=TRUE, line=-2)
+if(!ExportTikzForPaper){
+  title(main=c("PIVs Dynamics", "FlexRL: instability for V5 and mistakes"), outer=TRUE, line=-2)
+}
 polygon( c(1:length(alpha_mean_line), rev(1:length(alpha_mean_line))), c(alpha_mean_line-alpha_sd_shape, rev(alpha_mean_line+alpha_sd_shape)), col=adjustcolor("gray",alpha.f=0.6), border=NA)
 abline(h = 0.28, col="red")
-dev.off()
+if(ExportTikzForPaper){
+  dev.off()
+}
 
 proba_same_H = CombineSimu(folders, "Simu_results_unstable_alpha_probaTrue\\.csv$")
 proba_same_H = t(apply(proba_same_H[non_zero,], 1, function(x){sort(x, decreasing=TRUE)}))
@@ -433,13 +469,17 @@ timesEstimate_sd_shape = timesEstimate_sd_shape[!is.na(timesEstimate_sd_shape)]
 timesEstimate_mean_line = timesEstimate_mean_line[1:len]
 timesEstimate_sd_shape = timesEstimate_sd_shape[1:len]
 # TRUTH
-tikz('alpha instabl model.tex', width = 3.25, height = 3.25)
+if(ExportTikzForPaper){
+  tikz('alpha instabl model.tex', width = 3.25, height = 3.25)
+}
 plot( time_difference_mean_line, proba_same_H_mean_line, ylim=c(0,1), type="l", xlab = "time difference", ylab = sprintf("true model for proba of no change in V5") )
 polygon( c(time_difference_mean_line, rev(time_difference_mean_line)), c(proba_same_H_mean_line-proba_same_H_sd_shape, rev(proba_same_H_mean_line+proba_same_H_sd_shape)), col=adjustcolor("red",alpha.f=0.4), border=NA)
 # ESTIMATION
 lines( timesEstimate_mean_line, probaEstimate_mean_line, ylim=c(0,1), xlab = "time difference", ylab = sprintf("estimated model for proba of no change in V5") )
 polygon( c(timesEstimate_mean_line, rev(timesEstimate_mean_line)), c(probaEstimate_mean_line-probaEstimate_sd_shape, rev(probaEstimate_mean_line+probaEstimate_sd_shape)), col=adjustcolor("gray",alpha.f=0.6), border=NA)
-dev.off()
+if(ExportTikzForPaper){
+  dev.off()
+}
 
 ### OUR METHOD: FLEXRL
 #   RESULTS:
@@ -457,62 +497,92 @@ phiV3_data = phiV3_data[non_zero,]
 phiV4_data = phiV4_data[non_zero,]
 phiV5_data = phiV5_data[non_zero,]
 
-# par(mfrow=c(2,3))
+par(mfrow=c(2,3))
 
-tikz('phiv1 stabl.tex', width = 3.25, height = 3.25)
+if(ExportTikzForPaper){
+  tikz('phiv1 stabl.tex', width = 3.25, height = 3.25)
+}
 phiV1_mean_line = 1 - apply(phiV1_data, 2, mean)
 phiV1_sd_shape = apply(phiV1_data, 2, stats::sd)
 plot(phiV1_mean_line, type="l", ylim=c(0,1), xlab="StEM iterations", ylab=sprintf("Mistakes in PIV V1"))
-# title(main=c("Parameter for mistakes,", "FlexRL: all stable and mistakes"), outer=TRUE, line=-2)
+if(!ExportTikzForPaper){
+  title(main=c("Parameter for mistakes,", "FlexRL: all stable and mistakes"), outer=TRUE, line=-2)
+}
 polygon( c(1:length(phiV1_mean_line), rev(1:length(phiV1_mean_line))), c(phiV1_mean_line-phiV1_sd_shape, rev(phiV1_mean_line+phiV1_sd_shape)), col=adjustcolor("gray",alpha.f=0.6), border=NA)
 abline(h = true_mistake_V1_mean, col="red")
 polygon( c(1:length(true_mistake_V1_mean), rev(1:length(true_mistake_V1_mean))), c(true_mistake_V1_mean-true_mistake_V1_sd, rev(true_mistake_V1_mean+true_mistake_V1_sd)), col=adjustcolor("red",alpha.f=0.4), border=NA)
-dev.off()
+if(ExportTikzForPaper){
+  dev.off()
+}
 
-tikz('phiv2 stabl.tex', width = 3.25, height = 3.25)
+if(ExportTikzForPaper){
+  tikz('phiv2 stabl.tex', width = 3.25, height = 3.25)
+}
 phiV2_mean_line = 1 - apply(phiV2_data, 2, mean)
 phiV2_sd_shape = apply(phiV2_data, 2, stats::sd)
 plot(phiV2_mean_line, type="l", ylim=c(0,1), xlab="StEM iterations", ylab=sprintf("Mistakes in PIV V2"))
 polygon( c(1:length(phiV2_mean_line), rev(1:length(phiV2_mean_line))), c(phiV2_mean_line-phiV2_sd_shape, rev(phiV2_mean_line+phiV2_sd_shape)), col=adjustcolor("gray",alpha.f=0.6), border=NA)
 abline(h = true_mistake_V2_mean, col="red")
 polygon( c(1:length(true_mistake_V2_mean), rev(1:length(true_mistake_V2_mean))), c(true_mistake_V2_mean-true_mistake_V2_sd, rev(true_mistake_V2_mean+true_mistake_V2_sd)), col=adjustcolor("red",alpha.f=0.4), border=NA)
-dev.off()
+if(ExportTikzForPaper){
+  dev.off()
+}
 
-tikz('phiv3 stabl.tex', width = 3.25, height = 3.25)
+if(ExportTikzForPaper){
+  tikz('phiv3 stabl.tex', width = 3.25, height = 3.25)
+}
 phiV3_mean_line = 1 - apply(phiV3_data, 2, mean)
 phiV3_sd_shape = apply(phiV3_data, 2, stats::sd)
 plot(phiV3_mean_line, type="l", ylim=c(0,1), xlab="StEM iterations", ylab=sprintf("Mistakes in PIV V3"))
 polygon( c(1:length(phiV3_mean_line), rev(1:length(phiV3_mean_line))), c(phiV3_mean_line-phiV3_sd_shape, rev(phiV3_mean_line+phiV3_sd_shape)), col=adjustcolor("gray",alpha.f=0.6), border=NA)
 abline(h = true_mistake_V3_mean, col="red")
 polygon( c(1:length(true_mistake_V3_mean), rev(1:length(true_mistake_V3_mean))), c(true_mistake_V3_mean-true_mistake_V3_sd, rev(true_mistake_V3_mean+true_mistake_V3_sd)), col=adjustcolor("red",alpha.f=0.4), border=NA)
-dev.off()
+if(ExportTikzForPaper){
+  dev.off()
+}
 
-tikz('phiv4 stabl.tex', width = 3.25, height = 3.25)
+if(ExportTikzForPaper){
+  tikz('phiv4 stabl.tex', width = 3.25, height = 3.25)
+}
 phiV4_mean_line = 1 - apply(phiV4_data, 2, mean)
 phiV4_sd_shape = apply(phiV4_data, 2, stats::sd)
 plot(phiV4_mean_line, type="l", ylim=c(0,1), xlab="StEM iterations", ylab=sprintf("Mistakes in PIV V4"))
 polygon( c(1:length(phiV4_mean_line), rev(1:length(phiV4_mean_line))), c(phiV4_mean_line-phiV4_sd_shape, rev(phiV4_mean_line+phiV4_sd_shape)), col=adjustcolor("gray",alpha.f=0.6), border=NA)
 abline(h = true_mistake_V4_mean, col="red")
 polygon( c(1:length(true_mistake_V4_mean), rev(1:length(true_mistake_V4_mean))), c(true_mistake_V4_mean-true_mistake_V4_sd, rev(true_mistake_V4_mean+true_mistake_V4_sd)), col=adjustcolor("red",alpha.f=0.4), border=NA)
-dev.off()
+if(ExportTikzForPaper){
+  dev.off()
+}
 
-tikz('phiv5 stabl.tex', width = 3.25, height = 3.25)
+if(ExportTikzForPaper){
+  tikz('phiv5 stabl.tex', width = 3.25, height = 3.25)
+}
 phiV5_mean_line = 1 - apply(phiV5_data, 2, mean)
 phiV5_sd_shape = apply(phiV5_data, 2, stats::sd)
 plot(phiV5_mean_line, type="l", ylim=c(0,1), xlab="StEM iterations", ylab=sprintf("Mistakes in PIV V5"))
 polygon( c(1:length(phiV5_mean_line), rev(1:length(phiV5_mean_line))), c(phiV5_mean_line-phiV5_sd_shape, rev(phiV5_mean_line+phiV5_sd_shape)), col=adjustcolor("gray",alpha.f=0.6), border=NA)
 abline(h = true_mistake_V5_mean, col="red")
 polygon( c(1:length(true_mistake_V5_mean), rev(1:length(true_mistake_V5_mean))), c(true_mistake_V5_mean-true_mistake_V5_sd, rev(true_mistake_V5_mean+true_mistake_V5_sd)), col=adjustcolor("red",alpha.f=0.4), border=NA)
-dev.off()
+if(ExportTikzForPaper){
+  dev.off()
+}
 
 #### GAMMA 
-# par(mfrow=c(1,1))
-tikz('gamma stabl.tex', width = 3.25, height = 3.25)
+
+par(mfrow=c(1,1))
+
+if(ExportTikzForPaper){
+  tikz('gamma stabl.tex', width = 3.25, height = 3.25)
+}
 gamma_data = CombineSimu(folders, "Simu_results_stable_gamma\\.csv$")
 gamma_mean_line = apply(gamma_data[non_zero,], 2, mean)
 gamma_sd_shape = apply(gamma_data[non_zero,], 2, stats::sd)
 plot(gamma_mean_line, type="l", ylim=c(0,1), xlab="post burnin StEM iterations", ylab="gamma")
-# title(main=c("Proportion of links", "FlexRL: all stable and mistakes"), outer=TRUE, line=-2)
+if(!ExportTikzForPaper){
+  title(main=c("Proportion of links", "FlexRL: all stable and mistakes"), outer=TRUE, line=-2)
+}
 polygon( c(1:length(gamma_mean_line), rev(1:length(gamma_mean_line))), c(gamma_mean_line-gamma_sd_shape, rev(gamma_mean_line+gamma_sd_shape)), col=adjustcolor("gray",alpha.f=0.6), border=NA)
 abline(h = 5/8, col="red")
-dev.off()
+if(ExportTikzForPaper){
+  dev.off()
+}

@@ -11,8 +11,8 @@ Rcpp:::sourceCpp("../functions.cpp")
 Nsimu = 10
 
 # should be 20000 and 10000 or 10000 and 100000
-ExchangerNSamples = 2000
-ExchangerNBurnin = 1000
+ExchangerNSamples = 200
+ExchangerNBurnin = 100
 
 # should be 100, 75, 200 and 100
 FlexRLUnstableStEMIter     = 100

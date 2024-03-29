@@ -1,4 +1,4 @@
-
+fullData = FALSE
 
 # SORRY TELLING: UNIQUE VALUES IN DATA
 uniquevalues = read.csv("datasetSHIW_recapstory.csv", row.names=1)["unique values",]
@@ -62,7 +62,9 @@ phiV1_data = read.csv("datasetSHIW_results_phi_agree_V1SESSO.csv", row.names=1)
 phiV2_data = read.csv("datasetSHIW_results_phi_agree_V2PAR.csv", row.names=1)
 phiV3_data = read.csv("datasetSHIW_results_phi_agree_V3ANASCI.csv", row.names=1)
 phiV4_data = read.csv("datasetSHIW_results_phi_agree_V4STACIV.csv", row.names=1)
-phiV5_data = read.csv("datasetSHIW_results_phi_agree_V5IREG.csv", row.names=1)
+if(fullData){
+  phiV5_data = read.csv("datasetSHIW_results_phi_agree_V5IREG.csv", row.names=1)
+}
 
 par(mfrow=c(2,3))
 
@@ -87,10 +89,12 @@ phiV4_mean_line = 1 - unlist(phiV4_data)
 plot(phiV4_mean_line, type="l", ylim=c(0,1), xlab="StEM iterations", ylab=sprintf("Mistakes in PIV V4 STACIV"))
 abline(h = true_mistake_V4_mean, col="red")
 
-true_mistake_V5_mean = 1 - true_agree[,"IREG"]
-phiV5_mean_line = 1 - unlist(phiV5_data)
-plot(phiV5_mean_line, type="l", ylim=c(0,1), xlab="StEM iterations", ylab=sprintf("Mistakes in PIV V5 IREG"))
-abline(h = true_mistake_V5_mean, col="red")
+if(fullData){
+  true_mistake_V5_mean = 1 - true_agree[,"IREG"]
+  phiV5_mean_line = 1 - unlist(phiV5_data)
+  plot(phiV5_mean_line, type="l", ylim=c(0,1), xlab="StEM iterations", ylab=sprintf("Mistakes in PIV V5 IREG"))
+  abline(h = true_mistake_V5_mean, col="red")
+}
 
 #### GAMMA 
 par(mfrow=c(1,1))

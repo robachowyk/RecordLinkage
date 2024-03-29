@@ -1,4 +1,4 @@
-
+fullData = FALSE
 
 # SORRY TELLING: UNIQUE VALUES IN DATA
 uniquevalues = read.csv("datasetNLTCS_recapstory.csv", row.names=1)["unique values",]
@@ -63,7 +63,9 @@ phiV2_data = read.csv("datasetNLTCS_results_phi_agree_V2dob_yy.csv", row.names=1
 phiV3_data = read.csv("datasetNLTCS_results_phi_agree_V3dob_mm.csv", row.names=1)
 phiV4_data = read.csv("datasetNLTCS_results_phi_agree_V4dob_dd.csv", row.names=1)
 phiV5_data = read.csv("datasetNLTCS_results_phi_agree_V5state.csv", row.names=1)
-phiV6_data = read.csv("datasetNLTCS_results_phi_agree_V6reg.csv", row.names=1)
+if(fullData){
+  phiV6_data = read.csv("datasetNLTCS_results_phi_agree_V6reg.csv", row.names=1)
+}
 
 par(mfrow=c(2,3))
 
@@ -93,10 +95,12 @@ phiV5_mean_line = 1 - unlist(phiV5_data)
 plot(phiV5_mean_line, type="l", ylim=c(0,1), xlab="StEM iterations", ylab=sprintf("Mistakes in PIV V5 state"))
 abline(h = true_mistake_V5_mean, col="red")
 
-true_mistake_V6_mean = 1 - true_agree[,"reg"]
-phiV6_mean_line = 1 - unlist(phiV6_data)
-plot(phiV6_mean_line, type="l", ylim=c(0,1), xlab="StEM iterations", ylab=sprintf("Mistakes in PIV V6 reg"))
-abline(h = true_mistake_V6_mean, col="red")
+if(fullData){
+  true_mistake_V6_mean = 1 - true_agree[,"reg"]
+  phiV6_mean_line = 1 - unlist(phiV6_data)
+  plot(phiV6_mean_line, type="l", ylim=c(0,1), xlab="StEM iterations", ylab=sprintf("Mistakes in PIV V6 reg"))
+  abline(h = true_mistake_V6_mean, col="red")
+}
 
 #### GAMMA 
 par(mfrow=c(1,1))

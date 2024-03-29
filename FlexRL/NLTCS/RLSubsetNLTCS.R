@@ -17,9 +17,11 @@ results = data.frame(matrix(0, nrow=7, ncol=4))
 colnames(results) = c("Exchanger", "BRL", "FlexRL_noinstability", "Naive")
 rownames(results) = c("F1Score", "Precision", "Recall", "FN", "FP", "TP", "MatrixDistance")
 
-### IMPORT DATA
+### IMPORT DATA names(df) %in% c("id", "name", "chapters")
 B = read.table("NLTCS1982.txt")
 A = read.table("NLTCS1994.txt")
+B = B[,!names(B) %in% c("helpertype", "helperpresent", "helperdo1", "helperdo2")]
+A = A[,!names(A) %in% c("helpertype", "helperpresent", "helperdo1", "helperdo2")]
 ### CHECK IF WE CAN FILTER ON reg (NA are 0 values)
 sum( (A$reg)==0 )
 sum( (B$reg)==0 )
