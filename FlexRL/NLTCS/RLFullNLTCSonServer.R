@@ -6,8 +6,8 @@ library(progress)
 library(Matrix)
 library(testit)
 library("BRL")
-source("../recordlinkage.r")
-Rcpp:::sourceCpp("../functions.cpp")
+source("recordlinkage.r")
+Rcpp:::sourceCpp("functions.cpp")
 
 newDirectory = sprintf("NLTCS %s", Sys.time())
 dir.create(newDirectory)
@@ -213,117 +213,23 @@ for(k in 1:length(PIVs)){
     }
   }
 }
-linkedpairs = which(DeltaNaive>0.5, arr.ind=TRUE)
-linkedpairsA = linkedpairs[,1]
-linkedpairsB = linkedpairs[,2]
-linkedTP = which((DeltaNaive>0.5) & (Delta==1), arr.ind=TRUE)
-linkedTPA = linkedTP[,1]
-linkedTPB = linkedTP[,2]
-linkedFP = which((DeltaNaive>0.5) & (Delta==0), arr.ind=TRUE)
-linkedFPA = linkedFP[,1]
-linkedFPB = linkedFP[,2]
-linkedFN = which((DeltaNaive<0.5) & (Delta==1), arr.ind=TRUE)
-linkedFNA = linkedFN[,1]
-linkedFNB = linkedFN[,2]
-### MISSING IN LINKED PAIRS
-NA_A = ( colSums(is.na(A[linkedpairsA,])) / length(linkedpairsA) )[PIVs]
-NA_B = ( colSums(is.na(B[linkedpairsB,])) / length(linkedpairsB) )[PIVs]
-### AGREEMENTS IN LINKED PAIRS
-recapAgreementsLinkedPairs = data.frame(matrix(0, nrow=0, ncol=length(PIVs)))
-colnames(recapAgreementsLinkedPairs) = PIVs
-for( i in 1:nrow(linkedpairs) ){
-  entityA = A[linkedpairsA[i],]
-  entityB = B[linkedpairsB[i],]
-  if(nrow(entityA)>0){
-    if(nrow(entityB)>0){
-      recapAgreementsLinkedPairs = rbind(recapAgreementsLinkedPairs, entityA[,PIVs] == entityB[,PIVs])
-    }
-  }
-}
-recapAgreementsLinkedPairs = colSums( recapAgreementsLinkedPairs, na.rm = TRUE ) / nrow( recapAgreementsLinkedPairs )
-### STORY TELLING
-df = data.frame( rbind(NA_A, NA_B, recapAgreementsLinkedPairs) )
-colnames(df) = PIVs
-rownames(df) = c("NaN in A", "NaN in B", "agreements btw linked pairs")
-write.csv(df, file.path(newDirectory, "datasetNLTCS_recaplinkedpairs_Naive.csv"))
-### MISSING IN TP
-NA_A = ( colSums(is.na(A[linkedTPA,])) / length(linkedTPA) )[PIVs]
-NA_B = ( colSums(is.na(B[linkedTPB,])) / length(linkedTPB) )[PIVs]
-### AGREEMENTS IN TP
-recapAgreementsTP = data.frame(matrix(0, nrow=0, ncol=length(PIVs)))
-colnames(recapAgreementsTP) = PIVs
-for( i in 1:nrow(linkedTP) ){
-  entityA = A[linkedTPA[i],]
-  entityB = B[linkedTPB[i],]
-  if(nrow(entityA)>0){
-    if(nrow(entityB)>0){
-      recapAgreementsTP = rbind(recapAgreementsTP, entityA[,PIVs] == entityB[,PIVs])
-    }
-  }
-}
-recapAgreementsTP = colSums( recapAgreementsTP, na.rm = TRUE ) / nrow( recapAgreementsTP )
-### STORY TELLING
-df = data.frame( rbind(NA_A, NA_B, recapAgreementsTP) )
-colnames(df) = PIVs
-rownames(df) = c("NaN in A", "NaN in B", "agreements btw TP")
-write.csv(df, file.path(newDirectory, "datasetNLTCS_recaplinkedTP_Naive.csv"))
-### MISSING IN FP
-NA_A = ( colSums(is.na(A[linkedFPA,])) / length(linkedFPA) )[PIVs]
-NA_B = ( colSums(is.na(B[linkedFPB,])) / length(linkedFPB) )[PIVs]
-### AGREEMENTS IN FP
-recapAgreementsFP = data.frame(matrix(0, nrow=0, ncol=length(PIVs)))
-colnames(recapAgreementsFP) = PIVs
-for( i in 1:nrow(linkedFP) ){
-  entityA = A[linkedFPA[i],]
-  entityB = B[linkedFPB[i],]
-  if(nrow(entityA)>0){
-    if(nrow(entityB)>0){
-      recapAgreementsFP = rbind(recapAgreementsFP, entityA[,PIVs] == entityB[,PIVs])
-    }
-  }
-}
-recapAgreementsFP = colSums( recapAgreementsFP, na.rm = TRUE ) / nrow( recapAgreementsFP )
-### STORY TELLING
-df = data.frame( rbind(NA_A, NA_B, recapAgreementsFP) )
-colnames(df) = PIVs
-rownames(df) = c("NaN in A", "NaN in B", "agreements btw FP")
-write.csv(df, file.path(newDirectory, "datasetNLTCS_recaplinkedFP_Naive.csv"))
-### MISSING IN FN
-NA_A = ( colSums(is.na(A[linkedFNA,])) / length(linkedFNA) )[PIVs]
-NA_B = ( colSums(is.na(B[linkedFNB,])) / length(linkedFNB) )[PIVs]
-### AGREEMENTS IN FN
-recapAgreementsFN = data.frame(matrix(0, nrow=0, ncol=length(PIVs)))
-colnames(recapAgreementsFN) = PIVs
-for( i in 1:nrow(linkedFN) ){
-  entityA = A[linkedFNA[i],]
-  entityB = B[linkedFNB[i],]
-  if(nrow(entityA)>0){
-    if(nrow(entityB)>0){
-      recapAgreementsFN = rbind(recapAgreementsFN, entityA[,PIVs] == entityB[,PIVs])
-    }
-  }
-}
-recapAgreementsFN = colSums( recapAgreementsFN, na.rm = TRUE ) / nrow( recapAgreementsFN )
-### STORY TELLING
-df = data.frame( rbind(NA_A, NA_B, recapAgreementsFN) )
-colnames(df) = PIVs
-rownames(df) = c("NaN in A", "NaN in B", "agreements btw FN")
-write.csv(df, file.path(newDirectory, "datasetNLTCS_recapnonlinkedFN_Naive.csv"))
 ### PERFORMANCE METRICS
-truepositive = sum( (DeltaNaive>0.5) & (Delta==1) )
-falsepositive = sum( (DeltaNaive>0.5) & (Delta==0) )
-falsenegative = sum( (DeltaNaive<0.5) & (Delta==1) )
+linked_pairs = data.frame(which(DeltaNaive>0.5, arr.ind=TRUE))
+linked_pairs = do.call(paste, c(linked_pairs[,c("row","col")], list(sep="_")))
+true_pairs = data.frame(which(Delta==1, arr.ind=TRUE))
+true_pairs = do.call(paste, c(true_pairs[,c("row","col")], list(sep="_")))
+truepositive = length( intersect(linked_pairs,true_pairs) )
+falsepositive = length( setdiff(linked_pairs, true_pairs) )
+falsenegative = length( setdiff(true_pairs, linked_pairs)  )
 precision = truepositive / (truepositive + falsepositive)
 recall = truepositive / (truepositive + falsenegative)
 f1score = 2 * (precision * recall) / (precision + recall)
-distance = sqrt( sum( (DeltaNaive - Delta)**2 ) )
 results["F1Score","Naive"] = f1score
 results["Precision","Naive"] = precision
 results["Recall","Naive"] = recall
 results["FN","Naive"] = falsenegative
 results["FP","Naive"] = falsepositive
 results["TP","Naive"] = truepositive
-results["MatrixDistance","Naive"] = distance
 
 ### FLEXRL (all PIVs stable)
 dataSimu = list( A             = encodedA,
@@ -337,120 +243,26 @@ dataSimu = list( A             = encodedA,
 fit = stEM(  data               = dataSimu,
              StEMIter           = 100, 
              StEMBurnin         = 75, 
-             GibbsIter          = 200, 
-             GibbsBurnin        = 100 )
+             GibbsIter          = 500, 
+             GibbsBurnin        = 200 )
 
-linkedpairs = which(fit$Delta>0.5, arr.ind=TRUE)
-linkedpairsA = linkedpairs[,1]
-linkedpairsB = linkedpairs[,2]
-linkedTP = which((fit$Delta>0.5) & (Delta==1), arr.ind=TRUE)
-linkedTPA = linkedTP[,1]
-linkedTPB = linkedTP[,2]
-linkedFP = which((fit$Delta>0.5) & (Delta==0), arr.ind=TRUE)
-linkedFPA = linkedFP[,1]
-linkedFPB = linkedFP[,2]
-linkedFN = which((fit$Delta<0.5) & (Delta==1), arr.ind=TRUE)
-linkedFNA = linkedFN[,1]
-linkedFNB = linkedFN[,2]
-### MISSING IN LINKED PAIRS
-NA_A = ( colSums(is.na(A[linkedpairsA,])) / length(linkedpairsA) )[PIVs]
-NA_B = ( colSums(is.na(B[linkedpairsB,])) / length(linkedpairsB) )[PIVs]
-### AGREEMENTS IN LINKED PAIRS
-recapAgreementsLinkedPairs = data.frame(matrix(0, nrow=0, ncol=length(PIVs)))
-colnames(recapAgreementsLinkedPairs) = PIVs
-for( i in 1:nrow(linkedpairs) ){
-  entityA = A[linkedpairsA[i],]
-  entityB = B[linkedpairsB[i],]
-  if(nrow(entityA)>0){
-    if(nrow(entityB)>0){
-      recapAgreementsLinkedPairs = rbind(recapAgreementsLinkedPairs, entityA[,PIVs] == entityB[,PIVs])
-    }
-  }
-}
-recapAgreementsLinkedPairs = colSums( recapAgreementsLinkedPairs, na.rm = TRUE ) / nrow( recapAgreementsLinkedPairs )
-### STORY TELLING
-df = data.frame( rbind(NA_A, NA_B, recapAgreementsLinkedPairs) )
-colnames(df) = PIVs
-rownames(df) = c("NaN in A", "NaN in B", "agreements btw linked pairs")
-write.csv(df, file.path(newDirectory, "datasetNLTCS_recaplinkedpairs_ours.csv"))
-### MISSING IN TP
-NA_A = ( colSums(is.na(A[linkedTPA,])) / length(linkedTPA) )[PIVs]
-NA_B = ( colSums(is.na(B[linkedTPB,])) / length(linkedTPB) )[PIVs]
-### AGREEMENTS IN TP
-recapAgreementsTP = data.frame(matrix(0, nrow=0, ncol=length(PIVs)))
-colnames(recapAgreementsTP) = PIVs
-for( i in 1:nrow(linkedTP) ){
-  entityA = A[linkedTPA[i],]
-  entityB = B[linkedTPB[i],]
-  if(nrow(entityA)>0){
-    if(nrow(entityB)>0){
-      recapAgreementsTP = rbind(recapAgreementsTP, entityA[,PIVs] == entityB[,PIVs])
-    }
-  }
-}
-recapAgreementsTP = colSums( recapAgreementsTP, na.rm = TRUE ) / nrow( recapAgreementsTP )
-### STORY TELLING
-df = data.frame( rbind(NA_A, NA_B, recapAgreementsTP) )
-colnames(df) = PIVs
-rownames(df) = c("NaN in A", "NaN in B", "agreements btw TP")
-write.csv(df, file.path(newDirectory, "datasetNLTCS_recaplinkedTP_ours.csv"))
-### MISSING IN FP
-NA_A = ( colSums(is.na(A[linkedFPA,])) / length(linkedFPA) )[PIVs]
-NA_B = ( colSums(is.na(B[linkedFPB,])) / length(linkedFPB) )[PIVs]
-### AGREEMENTS IN FP
-recapAgreementsFP = data.frame(matrix(0, nrow=0, ncol=length(PIVs)))
-colnames(recapAgreementsFP) = PIVs
-for( i in 1:nrow(linkedFP) ){
-  entityA = A[linkedFPA[i],]
-  entityB = B[linkedFPB[i],]
-  if(nrow(entityA)>0){
-    if(nrow(entityB)>0){
-      recapAgreementsFP = rbind(recapAgreementsFP, entityA[,PIVs] == entityB[,PIVs])
-    }
-  }
-}
-recapAgreementsFP = colSums( recapAgreementsFP, na.rm = TRUE ) / nrow( recapAgreementsFP )
-### STORY TELLING
-df = data.frame( rbind(NA_A, NA_B, recapAgreementsFP) )
-colnames(df) = PIVs
-rownames(df) = c("NaN in A", "NaN in B", "agreements btw FP")
-write.csv(df, file.path(newDirectory, "datasetNLTCS_recaplinkedFP_ours.csv"))
-### MISSING IN FN
-NA_A = ( colSums(is.na(A[linkedFNA,])) / length(linkedFNA) )[PIVs]
-NA_B = ( colSums(is.na(B[linkedFNB,])) / length(linkedFNB) )[PIVs]
-### AGREEMENTS IN FN
-recapAgreementsFN = data.frame(matrix(0, nrow=0, ncol=length(PIVs)))
-colnames(recapAgreementsFN) = PIVs
-for( i in 1:nrow(linkedFN) ){
-  entityA = A[linkedFNA[i],]
-  entityB = B[linkedFNB[i],]
-  if(nrow(entityA)>0){
-    if(nrow(entityB)>0){
-      recapAgreementsFN = rbind(recapAgreementsFN, entityA[,PIVs] == entityB[,PIVs])
-    }
-  }
-}
-recapAgreementsFN = colSums( recapAgreementsFN, na.rm = TRUE ) / nrow( recapAgreementsFN )
-### STORY TELLING
-df = data.frame( rbind(NA_A, NA_B, recapAgreementsFN) )
-colnames(df) = PIVs
-rownames(df) = c("NaN in A", "NaN in B", "agreements btw FN")
-write.csv(df, file.path(newDirectory, "datasetNLTCS_recapnonlinkedFN_ours.csv"))
 ### PERFORMANCE METRICS
-truepositive = sum( (fit$Delta>0.5) & (Delta==1) )
-falsepositive = sum( (fit$Delta>0.5) & (Delta==0) )
-falsenegative = sum( (fit$Delta<0.5) & (Delta==1) )
+linked_pairs = data.frame(which(fit$Delta>0.5, arr.ind=TRUE))
+linked_pairs = do.call(paste, c(linked_pairs[,c("row","col")], list(sep="_")))
+true_pairs = data.frame(which(Delta==1, arr.ind=TRUE))
+true_pairs = do.call(paste, c(true_pairs[,c("row","col")], list(sep="_")))
+truepositive = length( intersect(linked_pairs,true_pairs) )
+falsepositive = length( setdiff(linked_pairs, true_pairs) )
+falsenegative = length( setdiff(true_pairs, linked_pairs)  )
 precision = truepositive / (truepositive + falsepositive)
 recall = truepositive / (truepositive + falsenegative)
 f1score = 2 * (precision * recall) / (precision + recall)
-distance = sqrt( sum( (fit$Delta - Delta)**2 ) )
 results["F1Score","FlexRL_noinstability"] = f1score
 results["Precision","FlexRL_noinstability"] = precision
 results["Recall","FlexRL_noinstability"] = recall
 results["FN","FlexRL_noinstability"] = falsenegative
 results["FP","FlexRL_noinstability"] = falsepositive
 results["TP","FlexRL_noinstability"] = truepositive
-results["MatrixDistance","FlexRL_noinstability"] = distance
 
 write.csv(results, file.path(newDirectory, "datasetNLTCS_results.csv"))
 
