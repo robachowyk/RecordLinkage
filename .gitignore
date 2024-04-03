@@ -50,5 +50,5 @@ rsconnect/
 
 # Folders created by RecordLinkage programs
 **/.DS_Store
-RecordLinkage/FlexRL/NLTCS/NLTCS1982.txt
-RecordLinkage/FlexRL/NLTCS/NLTCS1994.txt
+/FlexRL/NLTCS/NLTCS1982.txt
+/FlexRL/NLTCS/NLTCS1994.txt
