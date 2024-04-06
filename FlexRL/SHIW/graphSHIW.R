@@ -1,4 +1,4 @@
-fullData = FALSE
+fullData = TRUE
 
 # SORRY TELLING: UNIQUE VALUES IN DATA
 uniquevalues = read.csv("datasetSHIW_recapstory.csv", row.names=1)["unique values",]
@@ -16,15 +16,19 @@ NAtruevalues = read.csv("datasetSHIW_recapstory.csv", row.names=1)["NaN in A tru
 # STORY TELLING TRUE LINKS: NO CHANGES
 
 # STORY TELLING ON LINKED PAIRS (FP, TP) and NON LINKED (FN)
+if(!fullData){
 BRL_linked = round(read.csv("datasetSHIW_recaplinkedpairs_BRL.csv", row.names=1), 2)
 BRL_TP = round(read.csv("datasetSHIW_recaplinkedTP_BRL.csv", row.names=1), 2)
 BRL_FP = round(read.csv("datasetSHIW_recaplinkedFP_BRL.csv", row.names=1), 2)
 BRL_FN = round(read.csv("datasetSHIW_recapnonlinkedFN_BRL.csv", row.names=1), 2)
+}
 
+if(!fullData){
 Exchanger_linked = round(read.csv("datasetSHIW_recaplinkedpairs_Exchanger.csv", row.names=1), 2)
 Exchanger_TP = round(read.csv("datasetSHIW_recaplinkedTP_Exchanger.csv", row.names=1), 2)
 Exchanger_FP = round(read.csv("datasetSHIW_recaplinkedFP_Exchanger.csv", row.names=1), 2)
 Exchanger_FN = round(read.csv("datasetSHIW_recapnonlinkedFN_Exchanger.csv", row.names=1), 2)
+}
 
 Naive_linked = round(read.csv("datasetSHIW_recaplinkedpairs_Naive.csv", row.names=1), 2)
 Naive_TP = round(read.csv("datasetSHIW_recaplinkedTP_Naive.csv", row.names=1), 2)
